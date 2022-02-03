@@ -1,107 +1,66 @@
-<?php
+from tkinter import *
+from PIL import ImageTk,Image
+import pymysql
+from tkinter import messagebox
+from AddBook import *
+from DeleteBook import *
+from ViewBooks import *
+from IssueBook import *
+from ReturnBook import *
+# Add your own database name and password here to reflect in the code
+mypass = "root"
+mydatabase="db"
 
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+con = pymysql.connect(host="localhost",user="root",password=mypass,database=mydatabase)
+cur = con.cursor()
 
-$uri = urldecode($uri);
+root = Tk()
+root.title("Library")
+root.minsize(width=400,height=400)
+root.geometry("600x500")
 
-$paths = require __DIR__.'/bootstrap/paths.php';
+# Take n greater than 0.25 and less than 5
+same=True
+n=0.25
 
-$requested = $paths['public'].$uri;
+# Adding a background image
+background_image =Image.open("lib.jpg")
+[imageSizeWidth, imageSizeHeight] = background_image.size
 
-// This file allows us to emulate Apache's "mod_rewrite" functionality from the
-// built-in PHP web server. This provides a convenient way to test a Laravel
-// application without having installed a "real" web server software here.
-if ($uri !== '/' and file_exists($requested))
-{
-	return false;
-}
+newImageSizeWidth = int(imageSizeWidth*n)
+if same:
+    newImageSizeHeight = int(imageSizeHeight*n) 
+else:
+    newImageSizeHeight = int(imageSizeHeight/n) 
+    
+background_image = background_image.resize((newImageSizeWidth,newImageSizeHeight),Image.ANTIALIAS)
+img = ImageTk.PhotoImage(background_image)
 
-require_once $paths['public'].'/index.php';
-#installing necessary packages
-install.packages("arules")
-install.packages("arulesViz")
-install.packages("dataset")
-install.packages("Groceries")
+Canvas1 = Canvas(root)
 
-str(Groceries)
-summary(Groceries)
+Canvas1.create_image(300,340,image = img)      
+Canvas1.config(bg="white",width = newImageSizeWidth, height = newImageSizeHeight)
+Canvas1.pack(expand=True,fill=BOTH)
 
-#importing
-library(arules)
-library(arulesViz)
-library(dataset)
+headingFrame1 = Frame(root,bg="#FFBB00",bd=5)
+headingFrame1.place(relx=0.2,rely=0.1,relwidth=0.6,relheight=0.16)
 
-#taking csv file
-groceries<-read.transactions("groceries.csv", sep=",")
-setwd("D:/Shimla/archive/groceries.csv")
+headingLabel = Label(headingFrame1, text="Welcome to \n DataFlair Library", bg='black', fg='white', font=('Courier',15))
+headingLabel.place(relx=0,rely=0, relwidth=1, relheight=1)
 
-#taking csv to a variable
-orders<-read.csv("D:/Shimla/archive/groceries.csv")
+btn1 = Button(root,text="Add Book Details",bg='black', fg='white', command=addBook)
+btn1.place(relx=0.28,rely=0.4, relwidth=0.45,relheight=0.1)
+    
+btn2 = Button(root,text="Delete Book",bg='black', fg='white', command=delete)
+btn2.place(relx=0.28,rely=0.5, relwidth=0.45,relheight=0.1)
+    
+btn3 = Button(root,text="View Book List",bg='black', fg='white', command=View)
+btn3.place(relx=0.28,rely=0.6, relwidth=0.45,relheight=0.1)
+    
+btn4 = Button(root,text="Issue Book to Student",bg='black', fg='white', command = issueBook)
+btn4.place(relx=0.28,rely=0.7, relwidth=0.45,relheight=0.1)
+    
+btn5 = Button(root,text="Return Book",bg='black', fg='white', command = returnBook)
+btn5.place(relx=0.28,rely=0.8, relwidth=0.45,relheight=0.1)
 
-#output the orders
-head(orders)
-
-inspect(orders)
-orders
-
-#to choose different file
-read.transactions(file.choose())
-?apriori
-
-#default rules
-gr_rules<-apriori(orders) #default confidence = 0.8 sypport=0.1 
-
-#changing support and confidence
-gr_rules<-apriori(orders, parameter=list(supp=0.01, conf=0.8)) #68 rules written 
-
-#first five 
-inspect(gr_rules[1:5])
-inspect(gr_rules[1:10])
-
-#sorting by decreasing order of support and lift
-gr_rules_sup<-sort(gr_rules, by = "support", decreasing=T)
-gr_rules_lift<-sort(gr_rules, by = "lift", decreasing=T)
-inspect(gr_rules_sup[1:10])
-inspect(gr_rules_lift[1:10])
-
-?is.redundant
-gr_rules #68 rules
-
-#remove the redundancy
-redundant_rules<-is.redundant(gr_rules)
-redundant_rules
-
-summary(redundant_rules)#False: 25 True:43
-
-gr_rules<-gr_rules[!redundant_rules] #redundancy removed
-gr_rules
-inspect(gr_rules[1:5])
-
-#making rules according to the requirements for magenine
-gr_rules_beer<-apriori(orders,parameter = list(supp= .01, conf=.8),appearance=list(default="rhs", lhs="margarine="))
-inspect(gr_rules_beer)
-
-#plotting 
-plot(gr_rules, method="graph")
-plot(gr_rules, method="graph", interactive=T)
-
-#if you want another variable to be on left
-lhs<-readline()
-val<-1
-while(val=1)
-{
-	lhs<-readline()
-	gr_rules_beer<-apriori(orders,parameter = list(supp= .01, conf=.8),appearance=list(default="rhs", lhs="margarine="))
-	inspect(gr_rules_beer)
-
-	#plotting 
-	plot(gr_rules, method="graph")
-	plot(gr_rules, method="graph", interactive=T)
-	val<-readline()
-	val<-as.integer(val)
-}
-	
-	
-
-
-
+root.mainloop()
